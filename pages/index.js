@@ -4,12 +4,45 @@ import pp from "../public/pp.jpg";
 import Head from "next/head";
 import { MoonIcon, SunIcon } from "@heroicons/react/outline";
 import { useTheme } from "../context/theme";
+import { request, gql } from "graphql-request";
+import Link from "next/link";
 
-export default function Home() {
-  const [name, setName] = useState("Elon Musk");
-  const [image, setImage] = useState("");
-  const [title, setTitle] = useState("Tesla, SpaceX, Dogecoin");
+const graphqlAPI = process.env.NEXT_PUBLIC_GRAPHCMS_ENDPOINT;
 
+const getLinks = async () => {
+  const query = gql`
+    query MyQuery {
+      links {
+        url
+        link
+      }
+    }
+  `;
+  const result = await request(graphqlAPI, query);
+  return result.links;
+};
+
+const getInfo = async () => {
+  const query = gql`
+    query MyQuery {
+      infos {
+        description
+        title
+        profilePicture {
+          url
+        }
+      }
+    }
+  `;
+  const result = await request(graphqlAPI, query);
+  return result.infos;
+};
+
+export default function Home({ links, info }) {
+  const newInfo = info[0];
+  console.log(newInfo);
+  console.log("links", links);
+  console.log("infos", info);
   const { theme, setTheme } = useTheme();
 
   const themeHandler = () => {
@@ -71,22 +104,29 @@ export default function Home() {
             <div>
               <div className="w-40 h-40 mx-auto relative cursor-pointer">
                 <Image
-                  src={pp}
+                  src={newInfo.profilePicture.url}
                   className="rounded-full"
                   layout="fill"
                   objectFit="cover"
+                  alt="Profile Picture"
                 />
               </div>
-              <h2 className="mt-5 text-2xl font-bold">{name}</h2>
-              <p className="mt-3">{title}</p>
+              <h2 className="mt-5 text-2xl font-bold">{newInfo.title}</h2>
+              <p className="mt-3">{newInfo.description}</p>
             </div>
-            <div className="mt-10 max-w-2xl mx-auto">
-              <button
-                className="py-4 border rounded-lg w-full dark:bg-neutral-200 bg-neutral-800 text-neutral-200 dark:text-neutral-800 font-semibold text-lg hover:bg-zinc-100 transition-all ease-in-out transform duration-200 
-            focus:outline-2 focus:outline-transparent focus:border-transparent focus:ring focus:ring-indigo-500 hover:-translate-y-1"
-              >
-                Twitter
-              </button>
+            <div className="mt-10 max-w-2xl mx-auto flex flex-col sm:space-y-6 space-y-4">
+              {links.map((link) => {
+                return (
+                  <Link href={link.url}>
+                    <a
+                      className="py-4 border rounded-lg w-full dark:bg-neutral-200 dark:hover:bg-neutral-100 dark:hover:text-neutral-700 bg-neutral-800 hover:bg-neutral-700 hover:text-neutral-100 text-neutral-200 dark:text-neutral-800 font-semibold text-lg transition-all ease-in-out transform duration-200 
+focus:outline-2 focus:outline-transparent focus:border-transparent focus:ring focus:ring-indigo-500 hover:-translate-y-0.5"
+                    >
+                      {link.link}
+                    </a>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -108,4 +148,16 @@ export default function Home() {
       </svg>
     </>
   );
+}
+
+export async function getStaticProps() {
+  const links = (await getLinks()) || [];
+  const info = (await getInfo()) || [];
+  return {
+    props: {
+      links,
+      info,
+    },
+    revalidate: 60,
+  };
 }

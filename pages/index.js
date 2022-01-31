@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Image from "next/image";
-import pp from "../public/pp.jpg";
 import Head from "next/head";
 import { MoonIcon, SunIcon } from "@heroicons/react/outline";
 import { useTheme } from "../context/theme";

@@ -114,9 +114,9 @@ export default function Home({ links, info }) {
               <p className="mt-3">{newInfo.description}</p>
             </div>
             <div className="mt-10 max-w-2xl mx-auto flex flex-col sm:space-y-6 space-y-4">
-              {links.map((link) => {
+              {links.map((link, index) => {
                 return (
-                  <Link href={link.url}>
+                  <Link href={link.url} key={index}>
                     <a
                       className="py-4 border rounded-lg w-full dark:bg-neutral-200 dark:hover:bg-neutral-100 dark:hover:text-neutral-700 bg-neutral-800 hover:bg-neutral-700 hover:text-neutral-100 text-neutral-200 dark:text-neutral-800 font-semibold text-lg transition-all ease-in-out transform duration-200 
 focus:outline-2 focus:outline-transparent focus:border-transparent focus:ring focus:ring-indigo-500 hover:-translate-y-0.5"

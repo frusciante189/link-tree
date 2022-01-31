@@ -108,6 +108,7 @@ export default function Home({ links, info }) {
                   layout="fill"
                   objectFit="cover"
                   alt="Profile Picture"
+                  priority
                 />
               </div>
               <h2 className="mt-5 text-2xl font-bold">{newInfo.title}</h2>
